@@ -37,8 +37,8 @@ final class NurseController extends AbstractController
             ]);
         } else {
             return $this->json([
-                'error' => 'Enfermero no encontrado',
-                'message' => "No se encontró ningún enfermero con el nombre: {$name}"
+                'error' => 'Nurse not found',
+                'message' => "Nurse name not found: {$name}"
             ], 404);
         }
     }
