@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class NurseController extends AbstractController
 {
     // FindByName function
-    #[Route('/nurse/name/{name}', name: 'app_find_by_name')]
+    #[Route('/nurse/name/{name}', methods: ['GET'], name: 'app_find_by_name')]
     public function findByName(string $name): JsonResponse
     {
         // Ruta al archivo nurses.json
@@ -18,7 +18,6 @@ final class NurseController extends AbstractController
         // Leer y decodificar el archivo JSON
         $jsonContent = file_get_contents($jsonFile);
         $nurses = json_decode($jsonContent, true);
-
 
         // Buscar el enfermero por nombre (Uso del " === " para que busque el nombre exacto)
         $foundNurse = null;
