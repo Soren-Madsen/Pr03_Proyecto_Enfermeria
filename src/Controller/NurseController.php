@@ -33,6 +33,7 @@ final class NurseController extends AbstractController
         return $data;
     }
 
+    
     // FindByName function
     #[Route('/nurse/name/{name}', methods: ['GET'], name: 'app_find_by_name')]
     public function findByName(string $name): JsonResponse
@@ -44,14 +45,20 @@ final class NurseController extends AbstractController
         if (isset($jsonData['nurses']) && is_array($jsonData['nurses'])) {
             foreach ($jsonData['nurses'] as $nurse) {
                 if ($nurse['name'] === $name) {
-                    $foundNurse = $nurse['name'];
-                    break;
+                    $foundNurse = $nurse;
                 }
             }
         }
 
-        // Devolver resultado
-        return new JsonResponse($foundNurse ? ['success' => "Nurse {$name} found!"] : ['error' => "Nurse not found!"], $foundNurse ? 200 : 404);
+        // Devolver resultado con los datos del enfermero
+        if ($foundNurse) {
+            return $this->json([
+                'nurse' => $foundNurse,
+                'success' => "Nurse {$name} found!"
+            ]);
+        }
+        
+        return $this->json(['error' => "Nurse not found!"], 404);
     }
 
     // GetAll function
