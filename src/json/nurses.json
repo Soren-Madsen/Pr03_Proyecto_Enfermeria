@@ -1,6 +1,7 @@
 {
     "nurses" : [
         {
+            "name": "Ana",
             "email": "nurse1@hospital.com",
             "password": "12345"
         }

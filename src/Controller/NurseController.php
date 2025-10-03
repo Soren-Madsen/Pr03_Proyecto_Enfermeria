@@ -37,31 +37,21 @@ final class NurseController extends AbstractController
     #[Route('/nurse/name/{name}', methods: ['GET'], name: 'app_find_by_name')]
     public function findByName(string $name): JsonResponse
     {
-        $nurses = $this->getNurseJson();
+        $jsonData = $this->getNurseJson();
 
         // Buscar el enfermero por nombre (Uso del " === " para que busque el nombre exacto)
         $foundNurse = null;
-        foreach ($nurses as $nurse) {
-            if (
-                isset($nurse['name']) &&
-                strcasecmp($nurse['name'], $name) === 0
-            ) {
-                $foundNurse = $nurse;
-                break;
+        if (isset($jsonData['nurses']) && is_array($jsonData['nurses'])) {
+            foreach ($jsonData['nurses'] as $nurse) {
+                if ($nurse['name'] === $name) {
+                    $foundNurse = $nurse['name'];
+                    break;
+                }
             }
         }
 
         // Devolver resultado
-        if ($foundNurse) {
-            return $this->json([
-                'nurse' => $foundNurse,
-            ]);
-        } else {
-            return $this->json([
-                'error' => 'Nurse not found',
-                'message' => "Nurse {$name} not found"
-            ], 404);
-        }
+        return new JsonResponse($foundNurse ? ['success' => "Nurse {$name} found!"] : ['error' => "Nurse not found!"], $foundNurse ? 200 : 404);
     }
 
     // GetAll function
@@ -101,6 +91,7 @@ final class NurseController extends AbstractController
                 }
             }
         }
-        return new JsonResponse(['success' => $isValid]);
+
+        return new JsonResponse($isValid ? ['success' => $isValid] : ['error' => 'Login credentials invalid'], $isValid ? 200 : 403);
     }
 }
