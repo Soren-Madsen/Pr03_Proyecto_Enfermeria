@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Route('/nurse')]
 final class NurseController extends AbstractController
 {
     // Helper method
@@ -33,9 +34,9 @@ final class NurseController extends AbstractController
         return $data;
     }
 
-    
+
     // FindByName function
-    #[Route('/nurse/name/{name}', methods: ['GET'], name: 'app_find_by_name')]
+    #[Route('/name/{name}', methods: ['GET'], name: 'app_find_by_name')]
     public function findByName(string $name): JsonResponse
     {
         $jsonData = $this->getNurseJson();
@@ -57,18 +58,18 @@ final class NurseController extends AbstractController
                 'success' => "Nurse {$name} found!"
             ]);
         }
-        
+
         return $this->json(['error' => "Nurse not found!"], 404);
     }
 
     // GetAll function
-    #[Route('/nurse/index', methods: ['GET'], name: 'allNurses')]
+    #[Route('/index', methods: ['GET'], name: 'allNurses')]
     public function getAll(): JsonResponse
     {
         return new JsonResponse($this->getNurseJson(), Response::HTTP_OK);
     }
 
-    #[Route('/nurse/login', name: 'hospital_login', methods: ['POST'])]
+    #[Route('/login', name: 'hospital_login', methods: ['POST'])]
     public function nurseLogin(Request $request): JsonResponse
     {
         // Form request, gets email and password from an HTML form
