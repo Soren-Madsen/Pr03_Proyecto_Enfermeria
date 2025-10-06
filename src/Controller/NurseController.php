@@ -17,17 +17,17 @@ final class NurseController extends AbstractController
         // Get nurse data from local file
         $jsonFile = $this->getParameter('kernel.project_dir') . '/src/json/nurses.json';
         if (!file_exists($jsonFile)) {
-            return new JsonResponse(['error' => 'File not found'], Response::HTTP_NOT_FOUND);
+            return ['error' => 'File not found'];
         }
-        $jsonData = file_get_contents($jsonFile);
+        $jsonData = @file_get_contents($jsonFile);
         // Validate if the JSON has data
         if ($jsonData === false) {
-            return new JsonResponse(['error' => 'Could not read file'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return ['error' => 'Could not read file'];
         }
         // Decode JSON to properly interact with data
         $data = json_decode($jsonData, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            return new JsonResponse(['error' => 'Invalid JSON format'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return ['error' => 'Invalid JSON format'];
         }
 
         // Return the json properly decoded if all checks were passed.
@@ -76,6 +76,7 @@ final class NurseController extends AbstractController
         $email = $request->request->get('email');
         $password = $request->request->get('password');
 
+
         // If the form request is null, try with JSON format
         if (!$email || !$password) {
             $requestData = json_decode($request->getContent(), true);
@@ -85,6 +86,10 @@ final class NurseController extends AbstractController
 
         // Get all of the data
         $json_data = $this->getNurseJson();
+
+        if (isset($json_data['error'])) {
+            return new JsonResponse($json_data, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
 
         // Key that keeps track if the request matches the local file, false by default.
         $isValid = false;
@@ -100,6 +105,6 @@ final class NurseController extends AbstractController
             }
         }
 
-        return new JsonResponse($isValid ? ['success' => $isValid] : ['error' => 'Login credentials invalid'], $isValid ? 200 : 403);
+        return new JsonResponse($isValid ? ['success' => $isValid] : ['error' => 'Login credentials invalid'], $isValid ? 200 : 401);
     }
 }
