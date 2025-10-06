@@ -33,7 +33,7 @@ final class NurseController extends AbstractController
         return $data;
     }
 
-    
+
     // FindByName function
     #[Route('/nurse/name/{name}', methods: ['GET'], name: 'app_find_by_name')]
     public function findByName(string $name): JsonResponse
@@ -57,7 +57,7 @@ final class NurseController extends AbstractController
                 'success' => "Nurse {$name} found!"
             ]);
         }
-        
+
         return $this->json(['error' => "Nurse not found!"], 404);
     }
 
@@ -89,7 +89,7 @@ final class NurseController extends AbstractController
         $isValid = false;
 
         // Checks JSON data, separates all nurses into separate keys, reads and compares, 
-        // if one comparison returns true, skips to JsonResponse
+        // if one comparison returns false, skips to JsonResponse
         if (isset($json_data['nurses']) && is_array($json_data['nurses'])) {
             foreach ($json_data['nurses'] as $nurse) {
                 if ($nurse['email'] === $email && $nurse['password'] === $password) {
