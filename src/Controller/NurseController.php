@@ -62,7 +62,7 @@ final class NurseController extends AbstractController
     }
 
     // GetAll function
-    #[Route('/nurse/getAll', methods: ['GET'], name: 'allNurses')]
+    #[Route('/nurse/index', methods: ['GET'], name: 'allNurses')]
     public function getAll(): JsonResponse
     {
         return new JsonResponse($this->getNurseJson(), Response::HTTP_OK);
