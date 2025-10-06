@@ -40,7 +40,7 @@ final class NurseController extends AbstractController
     {
         $jsonData = $this->getNurseJson();
 
-        // Buscar el enfermero por nombre (Uso del " === " para que busque el nombre exacto)
+        // Find nurse by name (Use " === " to search for the exact name)
         $foundNurse = null;
         if (isset($jsonData['nurses']) && is_array($jsonData['nurses'])) {
             foreach ($jsonData['nurses'] as $nurse) {
@@ -50,7 +50,7 @@ final class NurseController extends AbstractController
             }
         }
 
-        // Devolver resultado con los datos del enfermero
+        // Return result with nurse data
         if ($foundNurse) {
             return $this->json([
                 'nurse' => $foundNurse,
