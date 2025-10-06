@@ -1,0 +1,26 @@
+[
+{
+	"id": 1,
+	"name": "Usuario1",
+	"user": "Usuario1",
+	"password": "usuario1",
+	"age": "18",
+	"birthdate": "01/01/2001"
+},
+{
+	"id": 2,
+	"name": "Usuario2",
+	"user": "usuario2",
+	"password": "usuario2",
+	"age": "19",
+	"birthdate": "01/01/2002"
+},
+{
+	"id": 3,
+	"name": "Usuario3",
+	"user": "usuario3",
+	"password": "usuario3",
+	"age": "20",
+	"birthdate": "01/01/2003"
+}
+]
