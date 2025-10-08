@@ -70,7 +70,7 @@ final class NurseController extends AbstractController
     }
 
     #[Route('/login', name: 'hospital_login', methods: ['POST'])]
-    public function Login(Request $request): JsonResponse
+    public function login(Request $request): JsonResponse
     {
         // Form request, gets email and password from an HTML form
         $email = $request->request->get('email');
