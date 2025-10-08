@@ -70,7 +70,7 @@ final class NurseController extends AbstractController
     }
 
     #[Route('/login', name: 'hospital_login', methods: ['POST'])]
-    public function nurseLogin(Request $request): JsonResponse
+    public function login(Request $request): JsonResponse
     {
         // Form request, gets email and password from an HTML form
         $email = $request->request->get('email');
@@ -105,63 +105,9 @@ final class NurseController extends AbstractController
             }
         }
 
-        return new JsonResponse($isValid ? ['success' => $isValid] : ['error' => 'Login credentials invalid'], $isValid ? 200 : 401);
-    }
-
-    //Login 2
-    #[Route('/login', name: 'app_Nurse', methods: ['POST'])]
-    public function login(Request $request): JsonResponse
-    {
-
-        //************************************************************************************************
-        //RECUPERAR PARAMETROS del json
-        //Indicamos ruta del json
-        $jsonFilePath = $this->getParameter('kernel.project_dir') . '/data/nurses.json';
-        //Para leer el contenido del json
-        $jsonContent = file_get_contents($jsonFilePath);
-        //Para añadir los objetos json a un array asociativo
-        $usersData = json_decode($jsonContent, true);
-
-        //************************************************************************************************        
-        // POST parameter input(user, password) leer json desde postman
-        // Para añadir los objetos user y password de entrada datos json a un array asociativo
-        $input = json_decode($request->getContent(), true);
-
-        $user = $input['user'];
-        $password = $input['password'];
-        //dd($input); Pruebas para ver en postman los datos que recoge y pare aquí      
-
-        //************************************************************************************************
-        //PARA BUSCAR Y COMPARAR        
-        // Para buscar y comparar datos en la url con datos del array extraídos del json
-        $loginSuccess = false; // Para que sea falso por defecto antes de buscar en el array del json
-        //Comparamos y si coincide cambiamos la variable $loginSuccess a true
-        foreach ($usersData as $userData) {
-        
-            if ($userData['user'] == $user && 
-                $userData['password'] == $password) {
-                
-                $loginSuccess = true;
-                break;
-            }
-        }
-
-        //************************************************************************************************
-        //DEVUELVE RESULTADO        
-        // Retorna true si coinciden y false sino
-        if ($loginSuccess) {
-            return new JsonResponse(
-                ['success' => true, 'message' => 'True'], 
-                status: Response::HTTP_OK // Código 200 OK
-            );
-        } else {
-            // Error 401 Unauthorized o 400 Bad Request
-            return new JsonResponse(
-                ['success' => false, 'message' => 'False'], 
-                status: Response::HTTP_UNAUTHORIZED 
-            ); 
-        }
-    
+        return new JsonResponse($isValid ? [
+            'success' => $isValid] : [
+            'error' => $isValid], $isValid ? Response::HTTP_OK : Response::HTTP_UNAUTHORIZED);
     }
 
 }
