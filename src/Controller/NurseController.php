@@ -105,7 +105,9 @@ final class NurseController extends AbstractController
             }
         }
 
-        return new JsonResponse($isValid ? ['success' => $isValid] : ['error' => 'Login credentials invalid'], $isValid ? Response::HTTP_OK : Response::HTTP_UNAUTHORIZED);
+        return new JsonResponse($isValid ? [
+            'success' => $isValid] : [
+            'error' => 'Login credentials invalid'], $isValid ? Response::HTTP_OK : Response::HTTP_UNAUTHORIZED);
     }
 
 }
