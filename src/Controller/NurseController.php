@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use App\Repository\NurseRepository;
 
 #[Route('/nurse')]
 final class NurseController extends AbstractController
@@ -34,32 +35,23 @@ final class NurseController extends AbstractController
         return $data;
     }
 
-
     // FindByName function
     #[Route('/name/{name}', methods: ['GET'], name: 'app_find_by_name')]
-    public function findByName(string $name): JsonResponse
+    public function findByName(string $name, NurseRepository $nurseRepository): JsonResponse
     {
-        $jsonData = $this->getNurseJson();
+        $nurse = $nurseRepository->findByName($name);
 
-        // Find nurse by name (Use " === " to search for the exact name)
-        $foundNurse = null;
-        if (isset($jsonData['nurses']) && is_array($jsonData['nurses'])) {
-            foreach ($jsonData['nurses'] as $nurse) {
-                if ($nurse['name'] === $name) {
-                    $foundNurse = $nurse;
-                }
-            }
+        $data = [];
+
+        if ($nurse) {
+            $data[] = [
+                'name' => $nurse->getName(),
+                'email' => $nurse->getEmail(),
+                'password' => $nurse->getPassword(),
+            ];
         }
 
-        // Return result with nurse data
-        if ($foundNurse) {
-            return $this->json([
-                'nurse' => $foundNurse,
-                'success' => "Nurse {$name} found!"
-            ]);
-        }
-
-        return $this->json(['error' => "Nurse not found!"], 404);
+        return $this->json(['nurse' => $data], Response::HTTP_OK);
     }
 
     // GetAll function
@@ -106,8 +98,9 @@ final class NurseController extends AbstractController
         }
 
         return new JsonResponse($isValid ? [
-            'success' => $isValid] : [
-            'error' => $isValid], $isValid ? Response::HTTP_OK : Response::HTTP_UNAUTHORIZED);
+            'success' => $isValid
+        ] : [
+            'error' => $isValid
+        ], $isValid ? Response::HTTP_OK : Response::HTTP_UNAUTHORIZED);
     }
-
 }
