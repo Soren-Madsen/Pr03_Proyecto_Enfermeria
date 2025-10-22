@@ -103,4 +103,31 @@ final class NurseController extends AbstractController
             'error' => $isValid
         ], $isValid ? Response::HTTP_OK : Response::HTTP_UNAUTHORIZED);
     }
+
+    /**
+     * FindByID function
+     */
+    #[Route('/id/{id}', methods: ['GET'], name: 'app_find_by_id')]
+    public function findByID(string $id): JsonResponse
+    {
+        $jsonData = $this->getNurseJson();
+
+        $foundNurse = null;
+        if (isset($jsonData['nurses']) && is_array($jsonData['nurses'])) {
+            foreach ($jsonData['nurses'] as $nurse) {
+                if ($nurse['id'] === $id) {
+                    $foundNurse = $nurse;
+                }
+            }
+        }
+
+        if ($foundNurse) {
+            return $this->json([
+                'nurse' => $foundNurse,
+                'success' => "Nurse {$id} found!"
+            ]);
+        }
+
+        return $this->json(['error' => "Nurse not found!"], 404);
+    }
 }
