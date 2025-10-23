@@ -20,4 +20,9 @@ class NurseRepository extends ServiceEntityRepository
     {
         return $this->findOneBy(['name' => $name]);
     }
+
+    public function findAll(): array
+    {
+        return $this->findBy([]);
+    }
 }
