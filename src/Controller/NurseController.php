@@ -56,9 +56,19 @@ final class NurseController extends AbstractController
 
     // GetAll function
     #[Route('/index', methods: ['GET'], name: 'allNurses')]
-    public function getAll(): JsonResponse
+    public function getAll(NurseRepository $nurseRepository): JsonResponse
     {
-        return new JsonResponse($this->getNurseJson(), Response::HTTP_OK);
+        $nurses = $nurseRepository->findAll();
+        $data = [];
+        foreach ($nurses as $nurse) {
+            $data[] = [
+                'id' => $nurse->getId(),
+                'name' => $nurse->getName(),
+                'email' => $nurse->getEmail(),
+                'password' => $nurse->getPassword()
+            ];
+        }
+        return $this->json($data, Response::HTTP_OK);
     }
 
     #[Route('/login', name: 'hospital_login', methods: ['POST'])]
