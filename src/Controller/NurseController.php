@@ -113,4 +113,21 @@ final class NurseController extends AbstractController
             'error' => $isValid
         ], $isValid ? Response::HTTP_OK : Response::HTTP_UNAUTHORIZED);
     }
+
+    /**
+     * FindByID function
+     */
+    #[Route('/id/{id}', methods: ['GET'], name: 'app_find_by_id')]
+    public function findByID(string $id, NurseRepository $nurseRepository): JsonResponse
+    {
+        // Usamos el repositorio de Doctrine para buscar la entidad Nurse por su ID.
+        $foundNurse = $nurseRepository->find($id);
+        if ($foundNurse) {
+            return $this->json([
+                'nurse' => $foundNurse,
+                'success' => "Nurse {$id} found!"
+            ]);
+        }
+        return $this->json(['error' => "Nurse not found!"], JsonResponse::HTTP_NOT_FOUND);
+    }
 }
