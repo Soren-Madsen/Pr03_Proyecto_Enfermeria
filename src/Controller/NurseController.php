@@ -12,34 +12,18 @@ use App\Repository\NurseRepository;
 #[Route('/nurse')]
 final class NurseController extends AbstractController
 {
-    // Helper method
-    private function getNurseJson()
-    {
-        // Get nurse data from local file
-        $jsonFile = $this->getParameter('kernel.project_dir') . '/src/json/nurses.json';
-        if (!file_exists($jsonFile)) {
-            return ['error' => 'File not found'];
-        }
-        $jsonData = @file_get_contents($jsonFile);
-        // Validate if the JSON has data
-        if ($jsonData === false) {
-            return ['error' => 'Could not read file'];
-        }
-        // Decode JSON to properly interact with data
-        $data = json_decode($jsonData, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return ['error' => 'Invalid JSON format'];
-        }
+    private NurseRepository $nurseRepository;
 
-        // Return the json properly decoded if all checks were passed.
-        return $data;
+    public function __construct(NurseRepository $nurseRepository)
+    {
+        $this->nurseRepository = $nurseRepository;
     }
 
     // FindByName function
     #[Route('/name/{name}', methods: ['GET'], name: 'app_find_by_name')]
-    public function findByName(string $name, NurseRepository $nurseRepository): JsonResponse
+    public function findByName(string $name): JsonResponse
     {
-        $nurse = $nurseRepository->findByName($name);
+        $nurse = $this->nurseRepository->findByName($name);
 
         $data = [];
 
@@ -56,9 +40,9 @@ final class NurseController extends AbstractController
 
     // GetAll function
     #[Route('/index', methods: ['GET'], name: 'allNurses')]
-    public function getAll(NurseRepository $nurseRepository): JsonResponse
+    public function getAll(): JsonResponse
     {
-        $nurses = $nurseRepository->findAll();
+        $nurses = $this->nurseRepository->findAll();
         $data = [];
         foreach ($nurses as $nurse) {
             $data[] = [
@@ -78,8 +62,7 @@ final class NurseController extends AbstractController
         $email = $request->request->get('email');
         $password = $request->request->get('password');
 
-
-        // If the form request is null, try with JSON format
+        // If the form request is null, try with JSON headers
         if (!$email || !$password) {
             $requestData = json_decode($request->getContent(), true);
             $email = $requestData['email'] ?? null;
@@ -87,31 +70,22 @@ final class NurseController extends AbstractController
         }
 
         // Get all of the data
-        $json_data = $this->getNurseJson();
-
-        if (isset($json_data['error'])) {
-            return new JsonResponse($json_data, Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        $nurses = $this->nurseRepository->getNurseCredentials();
 
         // Key that keeps track if the request matches the local file, false by default.
         $isValid = false;
 
-        // Checks JSON data, separates all nurses into separate keys, reads and compares, 
-        // if one comparison returns false, skips to JsonResponse
-        if (isset($json_data['nurses']) && is_array($json_data['nurses'])) {
-            foreach ($json_data['nurses'] as $nurse) {
-                if ($nurse['email'] === $email && $nurse['password'] === $password) {
+        // Checks DB data, separates all nurses into separate keys, reads and compares, 
+        // if one comparison returns true, skips to JsonResponse
+        if (isset($nurses) && is_array($nurses)) {
+            foreach ($nurses as $nurse) {
+                if ($nurse['email'] === $email && $nurse['pwd'] === $password) {
                     $isValid = true;
                     break;
                 }
             }
         }
-
-        return new JsonResponse($isValid ? [
-            'success' => $isValid
-        ] : [
-            'error' => $isValid
-        ], $isValid ? Response::HTTP_OK : Response::HTTP_UNAUTHORIZED);
+        return new JsonResponse(['success' => $isValid], $isValid ? Response::HTTP_OK : Response::HTTP_UNAUTHORIZED);
     }
 
     /**
