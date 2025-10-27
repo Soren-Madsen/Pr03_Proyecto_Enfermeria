@@ -79,7 +79,7 @@ final class NurseController extends AbstractController
         // if one comparison returns true, skips to JsonResponse
         if (isset($nurses) && is_array($nurses)) {
             foreach ($nurses as $nurse) {
-                if ($nurse['email'] === $email && $nurse['pwd'] === $password) {
+                if ($nurse['email'] === $email && $nurse['password'] === $password) {
                     $isValid = true;
                     break;
                 }
