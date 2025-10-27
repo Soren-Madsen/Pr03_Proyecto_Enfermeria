@@ -70,7 +70,7 @@ final class NurseController extends AbstractController
         }
 
         // Get all of the data
-        $nurses = $this->nurseRepository->getNurseCredentials();
+        $nurses = $this->nurseRepository->findByEmail($email);
 
         // Key that keeps track if the request matches the local file, false by default.
         $isValid = false;
@@ -79,7 +79,7 @@ final class NurseController extends AbstractController
         // if one comparison returns true, skips to JsonResponse
         if (isset($nurses) && is_array($nurses)) {
             foreach ($nurses as $nurse) {
-                if ($nurse['email'] === $email && $nurse['password'] === $password) {
+                if ($nurse->getEmail() === $email && $nurse->getPassword() === $password) {
                     $isValid = true;
                     break;
                 }

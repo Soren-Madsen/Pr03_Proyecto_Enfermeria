@@ -25,4 +25,9 @@ class NurseRepository extends ServiceEntityRepository
     {
         return $this->findBy([]);
     }
+
+    public function findByEmail(string $email): array
+    {
+        return $this->findBy(['email' => $email]);
+    }
 }
