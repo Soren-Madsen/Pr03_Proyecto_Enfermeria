@@ -8,6 +8,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\NurseRepository;
+use App\Entity\Nurse;
+use Doctrine\ORM\EntityManagerInterface;
 
 #[Route('/nurse')]
 final class NurseController extends AbstractController
@@ -102,7 +104,36 @@ final class NurseController extends AbstractController
                 'success' => "Nurse {$id} found!"
             ]);
         }
-        return $this->json(['error' => "Nurse not found!"], JsonResponse::HTTP_NOT_FOUND);
+        return $this->json(['error' => "Nurse not found!"], Response::HTTP_NOT_FOUND);
+    }
+
+    // Create Nurse function
+    #[Route('/new', methods: ['POST'], name: 'app_create_nurse')]
+    public function create(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        // Check if email already exists
+        $existing = $this->nurseRepository->findByEmail($data['email']);
+        if (!empty($existing)) {
+            return $this->json(
+                ['error' => 'Email already exists'],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+
+        $nurse = new Nurse();
+        $nurse->setName($data['name']);
+        $nurse->setEmail($data['email']);
+        $nurse->setPassword($data['password']);
+
+        $em->persist($nurse);
+        $em->flush();
+
+        return $this->json(
+            ['id' => $nurse->getId(), 'message' => 'Nurse created'],
+            Response::HTTP_CREATED
+        );
     }
 
     /**
