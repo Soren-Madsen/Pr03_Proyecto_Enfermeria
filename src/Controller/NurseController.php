@@ -16,9 +16,10 @@ final class NurseController extends AbstractController
 {
     private NurseRepository $nurseRepository;
 
-    public function __construct(NurseRepository $nurseRepository)
+    public function __construct(NurseRepository $nurseRepository, EntityManagerInterface $entityManager)
     {
         $this->nurseRepository = $nurseRepository;
+        $this->entityManager = $entityManager;
     }
 
     // FindByName function
@@ -140,45 +141,51 @@ final class NurseController extends AbstractController
      * UpdateByID function (Actualiza una enfermera por ID)
      * Método: PUT /nurse/id/{id}
      */
-    #[Route('/id/{id}', methods: ['PUT'], name: 'app_update_by_id')]
-    public function updateByID(string $id, Request $request): JsonResponse
+ #[Route('/id/{id}', methods: ['PUT'], name: 'app_nurse_update')]
+    public function updateByID(Request $request, int $id): JsonResponse
     {
-        // 1. Buscar la entidad Nurse por su ID.
+        // 1. Buscar la enfermera por ID
+        // Nota: find() es un método nativo de ServiceEntityRepository y funciona directamente con el ID.
         $nurse = $this->nurseRepository->find($id);
 
+        // Verificar si la enfermera existe
         if (!$nurse) {
-            return $this->json(['error' => "Nurse with ID {$id} not found!"], Response::HTTP_NOT_FOUND);
+            return $this->json(['message' => "Enfermera con ID {$id} no encontrada."], Response::HTTP_NOT_FOUND);
         }
 
-        // 2. Decodificar el cuerpo JSON de la petición.
+        // 2. Decodificar el cuerpo JSON de la solicitud (se espera JSON para un PUT)
         $data = json_decode($request->getContent(), true);
 
-        if (json_last_error() !== JSON_ERROR_NONE || !is_array($data)) {
-            return $this->json(['error' => 'Invalid or empty JSON body provided.'], Response::HTTP_BAD_REQUEST);
+        if (!$data) {
+            return $this->json(['message' => 'Cuerpo JSON inválido o vacío'], Response::HTTP_BAD_REQUEST);
         }
 
-        // 3. Aplicar los cambios a la entidad (Actualización manual).
+        // 3. Actualizar solo los campos que se proporcionen en el JSON
         if (isset($data['name'])) {
             $nurse->setName($data['name']);
         }
+
         if (isset($data['email'])) {
             $nurse->setEmail($data['email']);
         }
+
+        // ADVERTENCIA: En una aplicación real, las contraseñas deberían hashearse antes de guardarse (ej. con el componente Security).
         if (isset($data['password'])) {
-            // NOTA: En una aplicación real, se debe hashear la contraseña.
             $nurse->setPassword($data['password']);
         }
 
-        // 4. Persistir los cambios. Asume que NurseRepository tiene un método save() 
-        // que llama a $entityManager->flush().
-        $this->nurseRepository->save($nurse);
+        // 4. Persistir los cambios en la base de datos
+        // flush() es necesario para ejecutar las actualizaciones en la DB.
+        $this->entityManager->flush();
 
-        // 5. Devolver una respuesta exitosa, usando el formato de datos de GetAll.
+        // 5. Retornar una respuesta de éxito con los datos actualizados
         return $this->json([
-            'id' => $nurse->getId(),
-            'name' => $nurse->getName(),
-            'email' => $nurse->getEmail(),
-            'message' => "Nurse with ID {$id} successfully updated!"
+            'message' => 'Enfermera actualizada correctamente',
+            'nurse' => [
+                'id' => $nurse->getId(),
+                'name' => $nurse->getName(),
+                'email' => $nurse->getEmail(),
+            ]
         ], Response::HTTP_OK);
     }
 
