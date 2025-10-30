@@ -189,4 +189,30 @@ final class NurseController extends AbstractController
         ], Response::HTTP_OK);
     }
 
+    /**
+     * DeleteByID function (Elimina una enfermera por ID)
+     * Método: DELETE /nurse/id/{id}
+     */
+    #[Route('/id/{id}', methods: ['DELETE'], name: 'app_delete_by_id')]
+    public function deleteByID(string $id, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $nurse = $this->nurseRepository->find($id);
+
+        if (!$nurse) {
+            return $this->json(['error' => "Nurse with ID {$id} not found!"], Response::HTTP_NOT_FOUND);
+        }
+
+        $deletedNurseData = [
+            'id' => $nurse->getId(),
+            'name' => $nurse->getName(),
+            'email' => $nurse->getEmail()
+        ];
+
+        $entityManager->remove($nurse);
+
+        return $this->json([
+            'message' => "Nurse with ID {$id} successfully deleted!",
+            'deleted_nurse' => $deletedNurseData
+        ], Response::HTTP_OK);
+    }
 }
