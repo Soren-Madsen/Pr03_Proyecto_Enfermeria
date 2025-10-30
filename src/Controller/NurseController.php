@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 final class NurseController extends AbstractController
 {
     private NurseRepository $nurseRepository;
+    private EntityManagerInterface $entityManager;
 
     public function __construct(NurseRepository $nurseRepository, EntityManagerInterface $entityManager)
     {
@@ -209,6 +210,8 @@ final class NurseController extends AbstractController
         ];
 
         $entityManager->remove($nurse);
+        $entityManager->flush(); 
+
 
         return $this->json([
             'message' => "Nurse with ID {$id} successfully deleted!",
