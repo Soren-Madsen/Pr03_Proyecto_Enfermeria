@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 final class NurseController extends AbstractController
 {
     private NurseRepository $nurseRepository;
+    private EntityManagerInterface $entityManager;
 
     public function __construct(NurseRepository $nurseRepository, EntityManagerInterface $entityManager)
     {
@@ -141,7 +142,7 @@ final class NurseController extends AbstractController
      * UpdateByID function (Actualiza una enfermera por ID)
      * Método: PUT /nurse/id/{id}
      */
- #[Route('/id/{id}', methods: ['PUT'], name: 'app_nurse_update')]
+    #[Route('/id/{id}', methods: ['PUT'], name: 'app_nurse_update')]
     public function updateByID(Request $request, int $id): JsonResponse
     {
         // 1. Buscar la enfermera por ID
@@ -209,6 +210,8 @@ final class NurseController extends AbstractController
         ];
 
         $entityManager->remove($nurse);
+        $entityManager->flush();
+
 
         return $this->json([
             'message' => "Nurse with ID {$id} successfully deleted!",
