@@ -18,10 +18,10 @@ cd /Users/soren/Documents/DAW2/Proyecto/Pr03_Proyecto_Enfermeria
 composer install
 ```
 
-3. Configure the database (example: SQLite for dev)
+3. Configure the database
 Edit `.env` and set:
 ```env
-DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db"
+DATABASE_URL="mysql://Nurse_forgotfuel:8d28f3d808de61576589f87613701945f3418ec0@5sjuec.h.filess.io:61001/Nurse_forgotfuel"
 ```
 
 4. Install Doctrine & tools (if not present)
