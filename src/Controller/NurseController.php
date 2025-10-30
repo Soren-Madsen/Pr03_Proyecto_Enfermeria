@@ -138,29 +138,29 @@ final class NurseController extends AbstractController
     }
 
     /**
-     * UpdateByID function (Actualiza una enfermera por ID)
-     * Método: PUT /nurse/id/{id}
+     * UpdateByID function (Update one nurse for ID)
+     * Method: PUT /nurse/id/{id}
      */
- #[Route('/id/{id}', methods: ['PUT'], name: 'app_nurse_update')]
+    #[Route('/id/{id}', methods: ['PUT'], name: 'app_nurse_update')]
     public function updateByID(Request $request, int $id): JsonResponse
     {
-        // 1. Buscar la enfermera por ID
-        // Nota: find() es un método nativo de ServiceEntityRepository y funciona directamente con el ID.
+        // Look for the nurse for ID
+        // Note: find() is one native method of ServiceEntityRepository and on to connect direct with the ID.
         $nurse = $this->nurseRepository->find($id);
 
-        // Verificar si la enfermera existe
+        // Verify should the nurse exists
         if (!$nurse) {
             return $this->json(['message' => "Enfermera con ID {$id} no encontrada."], Response::HTTP_NOT_FOUND);
         }
 
-        // 2. Decodificar el cuerpo JSON de la solicitud (se espera JSON para un PUT)
+        // Decode the JSON body of the request (JSON is expected for a PUT) 
         $data = json_decode($request->getContent(), true);
 
         if (!$data) {
             return $this->json(['message' => 'Cuerpo JSON inválido o vacío'], Response::HTTP_BAD_REQUEST);
         }
 
-        // 3. Actualizar solo los campos que se proporcionen en el JSON
+        // Update only the fields provided in the JSON
         if (isset($data['name'])) {
             $nurse->setName($data['name']);
         }
@@ -169,16 +169,16 @@ final class NurseController extends AbstractController
             $nurse->setEmail($data['email']);
         }
 
-        // ADVERTENCIA: En una aplicación real, las contraseñas deberían hashearse antes de guardarse (ej. con el componente Security).
+        // WARNING: In a aplication real, the passwords should hashearse before of the save (exemple: with the Security component).
         if (isset($data['password'])) {
             $nurse->setPassword($data['password']);
         }
 
-        // 4. Persistir los cambios en la base de datos
-        // flush() es necesario para ejecutar las actualizaciones en la DB.
+        // Persist the changes in the database
+        // flush() It is necessary to run the updates in the DB.
         $this->entityManager->flush();
 
-        // 5. Retornar una respuesta de éxito con los datos actualizados
+        // Retornar una respuesta de éxito con los datos actualizados
         return $this->json([
             'message' => 'Enfermera actualizada correctamente',
             'nurse' => [
