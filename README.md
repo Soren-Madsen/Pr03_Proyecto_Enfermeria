@@ -104,16 +104,6 @@ Base URL: `http://localhost:8000`
       -d '{"name":"New Name"}'
     ```
 
-## Notes & Best Practices
-- Passwords are handled in plain text in this project for testing only. Use password_hash() and password_verify() and Symfony Security for production.
-- When creating resources, returning HTTP 201 and a `Location` header pointing to the created resource is recommended.
-- Validate input payloads (required fields, email format) before persisting.
-- To inspect registered routes:
-```bash
-php bin/console debug:router
-```
-- Check logs at `var/log/dev.log` for server errors.
-
 ## Troubleshooting
 - 404 errors: confirm server running and route correct.
 - JSON parsing errors: ensure `Content-Type: application/json` and valid JSON body.
