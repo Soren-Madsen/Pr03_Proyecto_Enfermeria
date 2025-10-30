@@ -210,7 +210,7 @@ final class NurseController extends AbstractController
         ];
 
         $entityManager->remove($nurse);
-        $entityManager->flush();
+        $entityManager->flush(); 
 
 
         return $this->json([
