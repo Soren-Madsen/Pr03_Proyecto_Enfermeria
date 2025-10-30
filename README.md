@@ -9,8 +9,7 @@ Designed for development with Doctrine, includes helpers to import initial data 
 
 1. Clone the repository
 ```bash
-git clone <REPO_URL> /Users/soren/Documents/DAW2/Proyecto/Pr03_Proyecto_Enfermeria
-cd /Users/soren/Documents/DAW2/Proyecto/Pr03_Proyecto_Enfermeria
+git clone https://github.com/Soren-Madsen/Pr03_Proyecto_Enfermeria.git
 ```
 
 2. Install dependencies
