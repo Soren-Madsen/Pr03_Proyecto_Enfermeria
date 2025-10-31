@@ -108,4 +108,22 @@ Base URL: `http://localhost:8000`
 - JSON parsing errors: ensure `Content-Type: application/json` and valid JSON body.
 - DB errors: confirm `DATABASE_URL` and that migrations ran.
 
+## Continuous Integration (CI)
+
+This repository includes a GitHub Actions workflow to run the PHPUnit test-suite on pushes and pull requests to `main`.
+
+- Workflow: `.github/workflows/phpunit.yml` — sets up PHP 8.3, installs Composer dependencies and runs `vendor/bin/phpunit` using `phpunit.dist.xml`.
+
+Note: Running the full test-suite locally requires dev dependencies compatible with your local PHP version. Currently the project uses PHPUnit 12 which needs PHP >= 8.3. If your local PHP is older (for example 8.2), `composer install` will fail. To run tests locally either:
+
+1. Upgrade your local PHP to >= 8.3, then run:
+```bash
+composer install --no-interaction --prefer-dist
+vendor/bin/phpunit --configuration phpunit.dist.xml --testdox
+```
+
+or
+
+2. Adjust the development dependencies in `composer.json` (for example pin an older PHPUnit compatible with your PHP) — note this may diverge from CI.
+
 
