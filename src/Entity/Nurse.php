@@ -62,15 +62,4 @@ class Nurse
 
         return $this;
     }
-
-    public function save(Nurse $entity, bool $flush = true): void
-    {
-
-        $entityManager = $this->getEntityManager(); 
-        $entityManager->persist($entity);
-
-        if ($flush) {
-            $entityManager->flush();
-        }
-    }
 }
