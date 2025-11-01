@@ -14,14 +14,11 @@ use Doctrine\ORM\EntityManagerInterface;
 #[Route('/nurse')]
 final class NurseController extends AbstractController
 {
-    //Sin test
     private NurseRepository $nurseRepository;
-    private EntityManagerInterface $entityManager;
 
-    public function __construct(NurseRepository $nurseRepository, EntityManagerInterface $entityManager)
+    public function __construct(NurseRepository $nurseRepository)
     {
         $this->nurseRepository = $nurseRepository;
-        $this->entityManager = $entityManager;
     }
 
     // FindByName function
@@ -137,86 +134,5 @@ final class NurseController extends AbstractController
             ['id' => $nurse->getId(), 'message' => 'Nurse created'],
             Response::HTTP_CREATED
         );
-    }
-
-    /**
-     * UpdateByID function (Update one nurse for ID)
-     * Method: PUT /nurse/id/{id}
-     */
-    #[Route('/id/{id}', methods: ['PUT'], name: 'app_nurse_update')]
-    public function updateByID(Request $request, int $id): JsonResponse
-    {
-        // Look for the nurse for ID
-        // Note: find() is one native method of ServiceEntityRepository and on to connect direct with the ID.
-        $nurse = $this->nurseRepository->find($id);
-
-        // Verify should the nurse exists
-        if (!$nurse) {
-            return $this->json(['message' => "Enfermera con ID {$id} no encontrada."], Response::HTTP_NOT_FOUND);
-        }
-
-        // Decode the JSON body of the request (JSON is expected for a PUT) 
-        $data = json_decode($request->getContent(), true);
-
-        if (!$data) {
-            return $this->json(['message' => 'Cuerpo JSON inválido o vacío'], Response::HTTP_BAD_REQUEST);
-        }
-
-        // Update only the fields provided in the JSON
-        if (isset($data['name'])) {
-            $nurse->setName($data['name']);
-        }
-
-        if (isset($data['email'])) {
-            $nurse->setEmail($data['email']);
-        }
-
-        // WARNING: In a aplication real, the passwords should hashearse before of the save (exemple: with the Security component).
-        if (isset($data['password'])) {
-            $nurse->setPassword($data['password']);
-        }
-
-        // Persist the changes in the database
-        // flush() It is necessary to run the updates in the DB.
-        $this->entityManager->flush();
-
-        // Retornar una respuesta de éxito con los datos actualizados
-        return $this->json([
-            'message' => 'Enfermera actualizada correctamente',
-            'nurse' => [
-                'id' => $nurse->getId(),
-                'name' => $nurse->getName(),
-                'email' => $nurse->getEmail(),
-            ]
-        ], Response::HTTP_OK);
-    }
-
-    /**
-     * DeleteByID function (Elimina una enfermera por ID)
-     * Método: DELETE /nurse/id/{id}
-     */
-    #[Route('/id/{id}', methods: ['DELETE'], name: 'app_delete_by_id')]
-    public function deleteByID(string $id, EntityManagerInterface $entityManager): JsonResponse
-    {
-        $nurse = $this->nurseRepository->find($id);
-
-        if (!$nurse) {
-            return $this->json(['error' => "Nurse with ID {$id} not found!"], Response::HTTP_NOT_FOUND);
-        }
-
-        $deletedNurseData = [
-            'id' => $nurse->getId(),
-            'name' => $nurse->getName(),
-            'email' => $nurse->getEmail()
-        ];
-
-        $entityManager->remove($nurse);
-        $entityManager->flush(); 
-
-
-        return $this->json([
-            'message' => "Nurse with ID {$id} successfully deleted!",
-            'deleted_nurse' => $deletedNurseData
-        ], Response::HTTP_OK);
     }
 }
