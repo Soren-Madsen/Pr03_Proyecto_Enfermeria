@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 #[Route('/nurse')]
 final class NurseController extends AbstractController
 {
+    //Sin test
     private NurseRepository $nurseRepository;
     private EntityManagerInterface $entityManager;
 
