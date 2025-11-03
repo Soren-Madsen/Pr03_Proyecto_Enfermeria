@@ -2,38 +2,27 @@ name: Run PHPUnit tests
 
 on:
   push:
-    branches: [ main, develop, 54-ci---create-test-phpunit ]
+    branches: [ main, develop, "feature/**" ]
   pull_request:
-    branches: [ main, develop, 54-ci---create-test-phpunit ]
+    branches: [ main, develop ]
 
 jobs:
-  phpunit:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, intl, dom, xml, tokenizer, ctype, json, pdo_sqlite
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_mysql, dom, json, tokenizer
           coverage: none
 
-      - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist
+      - name: Install dependencies
+        run: composer install --no-progress --no-suggest --prefer-dist
 
-      - name: Create .env.test
-        run: |
-          echo "APP_ENV=test" > .env.test
-          echo "APP_SECRET=TestSecretKey" >> .env.test
-          echo "DATABASE_URL=sqlite:///%kernel.project_dir%/var/test.db" >> .env.test
-
-      - name: Prepare database
-        run: |
-          php bin/console doctrine:database:create --env=test
-          php bin/console doctrine:schema:update --force --env=test
-
-      - name: Run PHPUnit tests
-        run: vendor/bin/phpunit --testdox
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit
