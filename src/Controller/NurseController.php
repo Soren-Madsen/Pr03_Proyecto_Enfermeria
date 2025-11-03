@@ -11,14 +11,17 @@ use App\Repository\NurseRepository;
 use App\Entity\Nurse;
 use Doctrine\ORM\EntityManagerInterface;
 
+
 #[Route('/nurse')]
 final class NurseController extends AbstractController
 {
     private NurseRepository $nurseRepository;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(NurseRepository $nurseRepository)
+    public function __construct(NurseRepository $nurseRepository, EntityManagerInterface $entityManager)
     {
         $this->nurseRepository = $nurseRepository;
+        $this->entityManager = $entityManager;
     }
 
     // FindByName function
@@ -94,10 +97,10 @@ final class NurseController extends AbstractController
      * FindByID function
      */
     #[Route('/id/{id}', methods: ['GET'], name: 'app_find_by_id')]
-    public function findByID(string $id, NurseRepository $nurseRepository): JsonResponse
+    public function findByID(int $id): JsonResponse
     {
-        // Usamos el repositorio de Doctrine para buscar la entidad Nurse por su ID.
-        $foundNurse = $nurseRepository->find($id);
+        // We used the Doctrine repository to search for the Nurse entity by its ID.
+        $foundNurse = $this->nurseRepository->find($id);
         if ($foundNurse) {
             return $this->json([
                 'nurse' => $foundNurse,
@@ -109,7 +112,7 @@ final class NurseController extends AbstractController
 
     // Create Nurse function
     #[Route('/new', methods: ['POST'], name: 'app_create_nurse')]
-    public function create(Request $request, EntityManagerInterface $em): JsonResponse
+    public function create(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -127,12 +130,66 @@ final class NurseController extends AbstractController
         $nurse->setEmail($data['email']);
         $nurse->setPassword($data['password']);
 
-        $em->persist($nurse);
-        $em->flush();
+        $this->entityManager->persist($nurse);
+        $this->entityManager->flush();
 
         return $this->json(
             ['id' => $nurse->getId(), 'message' => 'Nurse created'],
             Response::HTTP_CREATED
         );
     }
+
+        /**
+     * UpdateByID function (Update one nurse for ID)
+     * Method: PUT /nurse/id/{id}
+     */
+    #[Route('/id/{id}', methods: ['PUT'], name: 'app_nurse_update')]
+    public function updateByID(Request $request, int $id): JsonResponse
+    {
+        // Look for the nurse for ID
+        // Note: find() is one native method of ServiceEntityRepository and on to connect direct with the ID.
+        $nurse = $this->nurseRepository->find($id);
+
+        // Verify should the nurse exists
+        if (!$nurse) {
+            return $this->json(['message' => "Nurse with ID {$id} not found."], Response::HTTP_NOT_FOUND);
+        }
+
+        // Decode the JSON body of the request (JSON is expected for a PUT) 
+        $data = json_decode($request->getContent(), true);
+
+        if (!$data) {
+            return $this->json(['message' => 'Body JSON invalid or empty'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Update only the fields provided in the JSON
+        if (isset($data['name'])) {
+            $nurse->setName($data['name']);
+        }
+
+        if (isset($data['email'])) {
+            $nurse->setEmail($data['email']);
+        }
+
+        // WARNING: In a aplication real, the passwords should hashearse before of the save (exemple: with the Security component).
+        if (isset($data['password'])) {
+            $nurse->setPassword($data['password']);
+        }
+
+        // Persist the changes in the database
+        // flush() It is necessary to run the updates in the DB.
+        $this->entityManager->flush();
+
+        // Return a success response with the updated data
+        return $this->json([
+            'message' => 'Nurse update',
+            'nurse' => [
+                'id' => $nurse->getId(),
+                'name' => $nurse->getName(),
+                'email' => $nurse->getEmail(),
+            ]
+        ], Response::HTTP_OK);
+    }
+
+
 }
