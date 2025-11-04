@@ -1,3 +1,4 @@
+---
 name: Run PHPUnit tests
 
 on:
@@ -21,11 +22,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up PHP ${{ matrix.php }}
+      - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, dom, json, tokenizer
+          extensions: >
+            mbstring, xml, ctype, iconv, intl,
+            pdo_sqlite, dom, json, tokenizer
           coverage: none
 
       - name: Show PHP version
@@ -45,5 +48,5 @@ jobs:
       - name: Run PHPUnit
         env:
           APP_ENV: test
-          DATABASE_URL: sqlite:///:memory:
-        run
+          DATABASE_URL: sqlite:///%kernel.project_dir%/var/test.db
+        run: vendor/bin/phpunit --testdox
