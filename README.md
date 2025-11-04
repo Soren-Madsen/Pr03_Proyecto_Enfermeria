@@ -103,6 +103,12 @@ Base URL: `http://localhost:8000`
       -d '{"name":"New Name"}'
     ```
 
+- DELETE /nurse/id/{id}
+  - Delete nurse by ID. Returns 200 with deleted nurse info on success, 404 if not found.
+  - Example:
+    ```bash
+    curl -X DELETE "http://localhost:8000/nurse/id/1"
+
 ## Troubleshooting
 - 404 errors: confirm server running and route correct.
 - JSON parsing errors: ensure `Content-Type: application/json` and valid JSON body.
