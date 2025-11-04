@@ -68,9 +68,9 @@ Los tests están ubicados en la carpeta `tests/` e incluyen pruebas del controla
 ### Endpoints principales (API)
 | Método | Ruta | Descripción |
 |--------|------|-------------|
-| `GET` | `/nurse/` | Listar enfermeros |
+| `GET` | `/nurse/index` | Listar enfermeros |
 | `GET` | `/nurse/{id}` | Ver detalle de un enfermero |
-| `POST` | `/nurse/` | Crear enfermero |
+| `POST` | `/nurse/new` | Crear enfermero |
 | `PUT` | `/nurse/{id}` | Actualizar enfermero |
 | `DELETE` | `/nurse/{id}` | Eliminar enfermero |
 
