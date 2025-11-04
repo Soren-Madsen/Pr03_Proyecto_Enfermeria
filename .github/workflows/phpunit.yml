@@ -42,8 +42,10 @@ jobs:
           mkdir -p var/cache/test var/log
           php bin/console cache:clear --env=test
 
-      - name: Create test database schema
-        run: php bin/console doctrine:schema:create --env=test
+      - name: Prepare test database
+        run: |
+          php bin/console doctrine:database:create --env=test
+          php bin/console doctrine:schema:update --force --env=test
 
       - name: Run PHPUnit
         env:
