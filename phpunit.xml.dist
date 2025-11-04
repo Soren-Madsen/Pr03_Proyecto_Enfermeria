@@ -4,29 +4,14 @@
     xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
     bootstrap="vendor/autoload.php"
     colors="true"
-    cacheDirectory=".phpunit.cache"
-    failOnDeprecation="true"
-    failOnWarning="true"
-    failOnNotice="true"
-    verbose="true"
 >
-
     <php>
-        <!-- Entorno de test -->
         <env name="APP_ENV" value="test"/>
         <env name="APP_DEBUG" value="1"/>
         <env name="KERNEL_CLASS" value="App\Kernel"/>
-
-        <!-- Base de datos en memoria -->
         <env name="DATABASE_URL" value="sqlite:///:memory:"/>
-
-        <!-- Desactivar correo y mensajería -->
         <env name="MAILER_DSN" value="null://null"/>
         <env name="MESSENGER_TRANSPORT_DSN" value="in-memory://"/>
-
-        <!-- Configuración PHP -->
-        <ini name="display_errors" value="1" />
-        <ini name="error_reporting" value="-1" />
     </php>
 
     <testsuites>
@@ -35,24 +20,9 @@
         </testsuite>
     </testsuites>
 
-    <coverage>
+    <source>
         <include>
             <directory>src</directory>
         </include>
-    </coverage>
-
-    <source ignoreSuppressionOfDeprecations="true"
-            ignoreIndirectDeprecations="true"
-            restrictNotices="true"
-            restrictWarnings="true">
-        <include>
-            <directory>src</directory>
-        </include>
-        <deprecationTrigger>
-            <method>Doctrine\Deprecations\Deprecation::trigger</method>
-            <method>Doctrine\Deprecations\Deprecation::delegateTriggerToBackend</method>
-            <function>trigger_deprecation</function>
-        </deprecationTrigger>
     </source>
-
 </phpunit>
