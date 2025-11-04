@@ -5,23 +5,29 @@
     xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
     bootstrap="vendor/autoload.php"
     colors="true"
-    beStrictAboutCoversAnnotation="false"
+    cacheDirectory=".phpunit.cache"
+    failOnDeprecation="true"
+    failOnWarning="true"
+    failOnNotice="true"
     verbose="true"
 >
+
     <php>
-        <!-- Entorn of test -->
+        <!-- Entorno de test -->
         <env name="APP_ENV" value="test"/>
         <env name="APP_DEBUG" value="1"/>
-
-        <!-- Kernel Symfony -->
         <env name="KERNEL_CLASS" value="App\Kernel"/>
 
-        <!-- In-memory databases (faster than using physical files) -->
+        <!-- Base de datos en memoria -->
         <env name="DATABASE_URL" value="sqlite:///:memory:"/>
 
-        <!-- Disable logs and emails during teststing -->
+        <!-- Desactivar correo y mensajería -->
         <env name="MAILER_DSN" value="null://null"/>
         <env name="MESSENGER_TRANSPORT_DSN" value="in-memory://"/>
+
+        <!-- Configuración PHP -->
+        <ini name="display_errors" value="1" />
+        <ini name="error_reporting" value="-1" />
     </php>
 
     <testsuites>
@@ -30,10 +36,24 @@
         </testsuite>
     </testsuites>
 
-    <!-- Opcional but recommended -->
     <coverage>
         <include>
             <directory>src</directory>
         </include>
     </coverage>
+
+    <source ignoreSuppressionOfDeprecations="true"
+            ignoreIndirectDeprecations="true"
+            restrictNotices="true"
+            restrictWarnings="true">
+        <include>
+            <directory>src</directory>
+        </include>
+        <deprecationTrigger>
+            <method>Doctrine\Deprecations\Deprecation::trigger</method>
+            <method>Doctrine\Deprecations\Deprecation::delegateTriggerToBackend</method>
+            <function>trigger_deprecation</function>
+        </deprecationTrigger>
+    </source>
+
 </phpunit>
