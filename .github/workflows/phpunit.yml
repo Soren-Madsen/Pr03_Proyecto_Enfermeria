@@ -1,41 +1,62 @@
 name: PHPUnit Tests
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
 
 jobs:
-  phpunit:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php: [ '8.3' ]
+    phpunit:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                php: ["8.3"]
+        env:
+            APP_ENV: test
+            DATABASE_URL: mysql://root:root@127.0.0.1:3306/app_test
+        services:
+            mysql:
+                image: mysql:8.0
+                env:
+                    MYSQL_ROOT_PASSWORD: root
+                    MYSQL_DATABASE: app_test
+                ports:
+                    - 3306:3306
+                options: >-
+                    --health-cmd="mysqladmin ping -h localhost"
+                    --health-interval=10s
+                    --health-timeout=5s
+                    --health-retries=3
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+            - name: Setup PHP
+              # pin to a released major version that is widely available on GitHub Actions
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php }}
+                  extensions: mbstring, intl, pdo, pdo_mysql
+                  coverage: none
 
-      - name: Setup PHP
-        # pin to a released major version that is widely available on GitHub Actions
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          extensions: mbstring, intl, pdo, pdo_mysql
-          coverage: none
+            - name: Cache Composer dependencies
+              uses: actions/cache@v4
+              with:
+                  # common composer cache path on Ubuntu runners
+                  path: ~/.composer/cache
+                  key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-composer-
 
-      - name: Cache Composer dependencies
-        uses: actions/cache@v4
-        with:
-          # common composer cache path on Ubuntu runners
-          path: ~/.composer/cache
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
+            - name: Install dependencies
+              run: composer install --no-progress --no-suggest --prefer-dist --no-interaction
 
-      - name: Install dependencies
-        run: composer install --no-progress --no-suggest --prefer-dist --no-interaction
+            - name: Prepare test database
+              run: |
+                  php bin/console doctrine:database:drop --env=test --force --if-exists
+                  php bin/console doctrine:database:create --env=test
+                  php bin/console doctrine:migrations:migrate --env=test --no-interaction
 
-      - name: Run PHPUnit
-        run: vendor/bin/phpunit --configuration phpunit.dist.xml --testdox
+            - name: Run PHPUnit
+              run: vendor/bin/phpunit --configuration phpunit.dist.xml --testdox

@@ -4,7 +4,6 @@
 # Instead, add .env to .gitignore and create your own.
 /.env
 /.env.dev
-/.env.test
 /.env.local
 /.env.local.php
 /.env.*.local
