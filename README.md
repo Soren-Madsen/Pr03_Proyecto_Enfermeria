@@ -23,7 +23,8 @@ composer install
 
 3. Configure the database
    Create your own `.env` and set your database URL:
-   https://symfony.com/doc/current/doctrine.html#configuring-the-database
+
+    https://symfony.com/doc/current/doctrine.html#configuring-the-database
 
 4. Install Doctrine & tools (if not present)
 

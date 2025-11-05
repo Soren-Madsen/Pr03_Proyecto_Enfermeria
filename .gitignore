@@ -1,17 +1,14 @@
 
 ###> symfony/framework-bundle ###
-/.env.local
+# We should not publicly expose our env, the database URL is left public and exposed to attackers.
+# Instead, add .env to .gitignore and create your own.
+/.env.dev
 /.env.local.php
 /.env.*.local
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 /var/
 /vendor/
-# We should not publicly expose our env, the database URL is left public and exposed to attackers.
-# Instead, add .env to .gitignore and create your own.
-.env
-.env.dev
-.env.test
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
