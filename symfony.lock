@@ -71,7 +71,7 @@
             "ref": "52e9754527a15e2b79d9a610f98185a1fe46622a"
         },
         "files": [
-            ".env.test",
+            ".env.test"
         ]
     },
     "symfony/framework-bundle": {
