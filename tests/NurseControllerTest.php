@@ -155,11 +155,14 @@ class NurseControllerTest extends WebTestCase
         $this->entityManager->persist($nurse);
         $this->entityManager->flush();
 
+        $this->entityManager->clear();
         $this->client->request('DELETE', '/nurse/id/' . $nurse->getId());
 
         $this->assertResponseIsSuccessful();
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
-        $deletedNurse = $this->entityManager->getRepository(Nurse::class)->find($nurse->getId());
+        $deletedNurse = $this->entityManager
+            ->getRepository(Nurse::class)
+            ->find($nurse->getId());
         $this->assertNull($deletedNurse, 'The nurse should no longer exist in the database after deletion.');
     }
 }

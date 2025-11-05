@@ -107,8 +107,10 @@ final class NurseController extends AbstractController
             $nurseData = [
                 'id' => $foundNurse->getId(),
                 'name' => $foundNurse->getName(),
-            ];            
-        }        
+                'email' => $foundNurse->getEmail(),
+            ];
+            return $this->json(['nurse' => $nurseData, 'success' => "Nurse {$id} found!"], Response::HTTP_OK);            
+        }                
         return $this->json(['error' => "Nurse not found!"], Response::HTTP_NOT_FOUND);
     }
 
