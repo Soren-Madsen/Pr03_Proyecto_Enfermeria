@@ -99,14 +99,16 @@ final class NurseController extends AbstractController
     #[Route('/id/{id}', methods: ['GET'], name: 'app_find_by_id')]
     public function findByID(int $id): JsonResponse
     {
-        // We used the Doctrine repository to search for the Nurse entity by its ID.
         $foundNurse = $this->nurseRepository->find($id);
+        
         if ($foundNurse) {
-            return $this->json([
-                'nurse' => $foundNurse,
-                'success' => "Nurse {$id} found!"
-            ]);
-        }
+            // Antes: return $this->json(['nurse' => $foundNurse,'success' => "Nurse {$id} found!"]);
+            // Ahora: Convertimos la entidad a un array de datos para el test
+            $nurseData = [
+                'id' => $foundNurse->getId(),
+                'name' => $foundNurse->getName(),
+            ];            
+        }        
         return $this->json(['error' => "Nurse not found!"], Response::HTTP_NOT_FOUND);
     }
 

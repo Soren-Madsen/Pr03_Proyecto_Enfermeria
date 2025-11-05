@@ -159,7 +159,8 @@ class NurseControllerTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
-        $this->assertEquals("Nurse with ID {$nurse->getId()} successfully deleted!", $responseData['message']);
+        $deletedNurse = $this->entityManager->getRepository(Nurse::class)->find($nurse->getId());
+        $this->assertNull($deletedNurse, 'The nurse should no longer exist in the database after deletion.');
     }
 }
 
