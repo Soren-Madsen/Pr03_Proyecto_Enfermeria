@@ -15,7 +15,7 @@ if (!is_file(dirname(__DIR__) . '/vendor/autoload_runtime.php')) {
 
 require_once dirname(__DIR__) . '/vendor/autoload_runtime.php';
 
-$envPath = dirname(__DIR__) . '/.env.local';
+$envPath = dirname(__DIR__) . '/.env.test';
 if (file_exists($envPath)) {
     (new Dotenv())->bootEnv($envPath);
 }
