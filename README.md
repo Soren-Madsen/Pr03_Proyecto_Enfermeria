@@ -1,8 +1,8 @@
-# 🏥 Proyecto de Gestión de Enfermería - *Cat Clean*
+# 🏥 Proyecto Enfermería – Symfony + Doctrine + PHPUnit + GitHub Actions CI - *Cat Clean*
 
 ## 📋 Propósito
-**Cat Clean** es una aplicación web desarrollada con **Symfony** y **Doctrine ORM** que permite gestionar enfermeros, pacientes y turnos.  
-El sistema incluye un **CRUD completo** (crear, leer, actualizar y eliminar) para los recursos principales, además de pruebas automatizadas con **PHPUnit** y un flujo de **Integración Continua (CI)** mediante **GitHub Actions**.
+**Cat Clean** presenta una aplicación web desarrollada con **Symfony** y **Doctrine ORM** que permite gestionar enfermeros.
+El sistema incluye un **CRUD completo** (`NurseController`) (crear, leer, actualizar y eliminar) para los recursos principales, además de pruebas automatizadas con **PHPUnit** y un flujo de **Integración Continua (CI)** mediante **GitHub Actions**.
 
 ---
 
@@ -13,6 +13,21 @@ El sistema incluye un **CRUD completo** (crear, leer, actualizar y eliminar) par
 - Composer  
 - Symfony CLI (opcional pero recomendado)  
 - SQLite (para entorno de test) o MySQL / MariaDB (para desarrollo)  
+- XAMPP o similar (para Apache/MySQL)
+- Extensiones PHP activas:
+openssl
+mbstring
+tokenizer
+xml
+xmlwriter
+dom
+libxml
+pdo_mysql
+intl
+curl
+fileinfo
+> 💡 Puedes verificarlas con `php -m`.
+---
 
 ### 🚀 Pasos de instalación
 
@@ -21,6 +36,7 @@ El sistema incluye un **CRUD completo** (crear, leer, actualizar y eliminar) par
    git clone https://github.com/Soren-Madsen/Pr03_Proyecto_Enfermeria.git
    cd Pr03_Proyecto_Enfermeria
    ```
+   Esto instalará todas las librerías necesarias (Symfony, Doctrine, PHPUnit, etc.).
 
 2. **Instalar dependencias:**
    ```bash
@@ -28,7 +44,21 @@ El sistema incluye un **CRUD completo** (crear, leer, actualizar y eliminar) par
    ```
 
 3. **Configurar el entorno:**
-   Copia el archivo `.env` y crea un archivo local:
+   .env
+   Contiene las variables del entorno de desarrollo.
+
+   .env.test
+   Entorno de test utilizado por PHPUnit.
+   Ejemplo recomendado:
+   APP_ENV=test
+   APP_DEBUG=1
+   APP_SECRET='$ecretf0rt3st'
+   DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db"
+   KERNEL_CLASS='App\Kernel'
+
+   Usa SQLite para las pruebas: no afecta tu base de datos MySQL local.
+   
+   Si quieres usar una BBDD local - Copia el archivo `.env` y crea un archivo local:
    ```bash
    cp .env .env.local
    ```
@@ -38,10 +68,14 @@ El sistema incluye un **CRUD completo** (crear, leer, actualizar y eliminar) par
    ```
 
 4. **Crear base de datos y ejecutar migraciones:**
+    Si usas MySQL en desarrollo, crea tu base de datos y aplica migraciones:
    ```bash
    php bin/console doctrine:database:create
    php bin/console doctrine:migrations:migrate
    ```
+    Para test (si usas SQLite):
+    php bin/console doctrine:database:create --env=test
+    php bin/console doctrine:migrations:migrate --env=test
 
 5. **Iniciar el servidor:**
    ```bash
@@ -63,6 +97,10 @@ Para ejecutar todos los tests:
 ```bash
 php bin/phpunit
 ```
+O para ver más detalles:
+```bash
+vendor/bin/phpunit --testdox
+```
 
 Los tests usan una base de datos **SQLite en memoria**, por lo que no modifican tus datos reales:
 ```
@@ -78,7 +116,7 @@ que ejecuta los tests cada vez que se realizan cambios en el repositorio.
 
 ### 🔹 1. Nombre del Workflow
 ```yaml
-name: Run PHPUnit tests
+name: Run PHPUnit testsComplete
 ```
 Es el nombre que aparecerá en la pestaña **Actions** de GitHub.
 
@@ -88,13 +126,13 @@ Es el nombre que aparecerá en la pestaña **Actions** de GitHub.
 ```yaml
 on:
   push:
-    branches: [ main, develop, "feature/**" ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
 ```
 Se ejecuta automáticamente cuando:
-- Haces un **push** a las ramas `main`, `develop` o cualquier rama que empiece por `feature/`.
-- Creas una **pull request** hacia `main` o `develop`.
+- Haces un **push** a la rama `main`.
+- Creas una **pull request** hacia `main`.
 
 💡 Esto garantiza que ningún cambio se fusione sin pasar las pruebas.
 
