@@ -78,6 +78,7 @@ Base URL: `http://localhost:8000`
     -   Example:
         ```bash
         curl -X GET "http://localhost:8000/nurse/index"
+
         ```
 
 -   POST /nurse/new
@@ -105,7 +106,8 @@ Base URL: `http://localhost:8000`
 
     -   Get nurse by ID. Example:
         ```bash
-        curl -X GET "http://localhost:8000/nurse/id/1"
+        curl -X GET "http://localhost:8000/nurse/id/1" \
+          -H "Content-Type: application/json"
         ```
 
 -   PUT /nurse/id/{id}
@@ -121,7 +123,8 @@ Base URL: `http://localhost:8000`
     -   Delete nurse by ID. Returns 200 with deleted nurse info on success, 404 if not found.
     -   Example:
         ```bash
-        curl -X DELETE "http://localhost:8000/nurse/id/1"
+        curl -X DELETE "http://localhost:8000/nurse/id/1" \
+          -H "Content-Type: application/json"
         ```
 
 ## Troubleshooting
