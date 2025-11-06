@@ -21,12 +21,13 @@ git clone https://github.com/Soren-Madsen/Pr03_Proyecto_Enfermeria.git
 composer install
 ```
 
-3. Configure the database
-   Create your own `.env` and set your database URL:
+3. Configure the database:
+
+   Create your own `.env` or use the mock one, and set your database URL:
 
     https://symfony.com/doc/current/doctrine.html#configuring-the-database
 
-4. Install Doctrine & tools (if not present)
+5. Install Doctrine & tools (if not present)
 
 ```bash
 composer require symfony/orm-pack
