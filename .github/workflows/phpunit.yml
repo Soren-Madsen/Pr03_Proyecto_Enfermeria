@@ -51,7 +51,7 @@ jobs:
           APP_ENV: test
           APP_DEBUG: 0
           DEFAULT_URI: http://localhost
-          DATABASE_URL: sqlite:///:memory:
+          DATABASE_URL: sqlite:///%kernel.project_dir%/var/test.db
           SYMFONY_DEPRECATIONS_HELPER: disabled
         run: |
           echo "✅ Running PHPUnit on PHP ${{ matrix.php }}..."
