@@ -155,7 +155,7 @@ final class NurseController extends AbstractController
         }
 
         // Decode the JSON body of the request (JSON is expected for a PUT) 
-        $data = json_decode($request->getContent(), true);
+        //$data = json_decode($request->getContent(), true);
 
         if (!$data) {
             return $this->json(['message' => 'Cuerpo JSON inválido o vacío'], Response::HTTP_BAD_REQUEST);
