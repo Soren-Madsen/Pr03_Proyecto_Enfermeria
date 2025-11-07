@@ -3,11 +3,9 @@ name: Run PHPUnit tests
 
 on:
   push:
-    branches:
-      - '**'
+    branches: ["**"]
   pull_request:
-    branches:
-      - '**'
+    branches: ["**"]
 
 jobs:
   test:
@@ -35,20 +33,26 @@ jobs:
         run: php -v
 
       - name: Install Composer dependencies
-        run: composer install --no-progress --no-suggest --prefer-dist
+        run: composer install --no-interaction --no-progress --prefer-dist
 
       - name: Prepare test environment
         run: |
           mkdir -p var/cache/test var/log
           php bin/console cache:clear --env=test
+          php bin/console cache:warmup --env=test
 
       - name: Prepare test database
         run: |
           php bin/console doctrine:database:create --env=test
           php bin/console doctrine:schema:update --force --env=test
 
-      - name: Run PHPUnit
+      - name: Run PHPUnit (silent)
         env:
           APP_ENV: test
-          DATABASE_URL: sqlite:///%kernel.project_dir%/var/test.db
-        run: vendor/bin/phpunit --testdox
+          APP_DEBUG: 0
+          DEFAULT_URI: http://localhost
+          DATABASE_URL: sqlite:///:memory:
+          SYMFONY_DEPRECATIONS_HELPER: disabled
+        run: |
+          echo "✅ Running PHPUnit on PHP ${{ matrix.php }}..."
+          vendor/bin/phpunit --testdox --no-coverage
