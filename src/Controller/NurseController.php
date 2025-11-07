@@ -147,7 +147,7 @@ final class NurseController extends AbstractController
     {
         // Look for the nurse for ID
         // Note: find() is one native method of ServiceEntityRepository and on to connect direct with the ID.
-        //$nurse = $this->nurseRepository->find($id);
+        $nurse = $this->nurseRepository->find($id);
 
         // Verify should the nurse exists
         if (!$nurse) {
