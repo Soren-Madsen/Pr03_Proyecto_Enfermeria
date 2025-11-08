@@ -23,9 +23,22 @@ composer install
 
 3. Configure the database:
 
-   Create your own `.env` or use the mock one, and set your database URL:
+The main `.env` file loads variables from local files. To set your sensitive, remote database URL for development, create a **`.env.local`** file (which is ignored by Git).
 
-    https://symfony.com/doc/current/doctrine.html#configuring-the-database
+* **1. Create the file:**
+    ```bash
+    touch .env.local
+    ```
+
+* **2. Add your remote connection URL** to the `.env.local` file:
+    ```dotenv
+    # .env.local (example)
+    DATABASE_URL="mysql://Nurse_forgotfuel:password@5sjuec.h.filess.io:61001/Nurse_forgotfuel"
+    ```
+
+For more general information on database configuration, refer to the Symfony documentation:
+[https://symfony.com/doc/current/doctrine.html#configuring-the-database](https://symfony.com/doc/current/doctrine.html#configuring-the-database)
+
 
 5. Install Doctrine & tools (if not present)
 
@@ -146,7 +159,8 @@ Note: Running the full test-suite locally requires dev dependencies compatible w
 
 ```bash
 composer install --no-interaction --prefer-dist
-vendor/bin/phpunit --configuration phpunit.dist.xml --testdox
+composer require symfony/phpunit-bridge --dev
+php vendor/bin/phpunit --configuration phpunit.dist.xml --testdox
 ```
 
 or
