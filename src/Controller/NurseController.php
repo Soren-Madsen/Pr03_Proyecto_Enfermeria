@@ -151,14 +151,14 @@ final class NurseController extends AbstractController
 
         // Verify should the nurse exists
         if (!$nurse) {
-            return $this->json(['message' => "Enfermera con ID {$id} no encontrada."], Response::HTTP_NOT_FOUND);
+            return $this->json(['message' => "Nurse with ID {$id} not found."], Response::HTTP_NOT_FOUND);
         }
 
         // Decode the JSON body of the request (JSON is expected for a PUT) 
-        //$data = json_decode($request->getContent(), true);
+        $data = json_decode($request->getContent(), true);
 
         if (!$data) {
-            return $this->json(['message' => 'Cuerpo JSON inválido o vacío'], Response::HTTP_BAD_REQUEST);
+            return $this->json(['message' => 'Body JSON invalid or empty'], Response::HTTP_BAD_REQUEST);
         }
 
         // Update only the fields provided in the JSON
@@ -179,9 +179,9 @@ final class NurseController extends AbstractController
         // flush() It is necessary to run the updates in the DB.
         $this->entityManager->flush();
 
-        // Retornar una respuesta de éxito con los datos actualizados
+        // Return a success response with the updated data
         return $this->json([
-            'message' => 'Enfermera actualizada correctamente',
+            'message' => 'Nurse update',
             'nurse' => [
                 'id' => $nurse->getId(),
                 'name' => $nurse->getName(),
