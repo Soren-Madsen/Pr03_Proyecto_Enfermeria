@@ -96,16 +96,20 @@ final class NurseController extends AbstractController
      * FindByID function
      */
     #[Route('/id/{id}', methods: ['GET'], name: 'app_find_by_id')]
-    public function findByID(string $id, NurseRepository $nurseRepository): JsonResponse
+    public function findByID(int $id): JsonResponse
     {
-        // Usamos el repositorio de Doctrine para buscar la entidad Nurse por su ID.
-        $foundNurse = $nurseRepository->find($id);
+        $foundNurse = $this->nurseRepository->find($id);
+        
         if ($foundNurse) {
-            return $this->json([
-                'nurse' => $foundNurse,
-                'success' => "Nurse {$id} found!"
-            ]);
-        }
+            // Before: return $this->json(['nurse' => $foundNurse,'success' => "Nurse {$id} found!"]);
+            // Now: We converted the entity to a data array for the test
+            $nurseData = [
+                'id' => $foundNurse->getId(),
+                'name' => $foundNurse->getName(),
+                'email' => $foundNurse->getEmail(),
+            ];
+            return $this->json(['nurse' => $nurseData, 'success' => "Nurse {$id} found!"], Response::HTTP_OK);            
+        }                
         return $this->json(['error' => "Nurse not found!"], Response::HTTP_NOT_FOUND);
     }
 
@@ -146,40 +150,26 @@ final class NurseController extends AbstractController
     public function updateByID(Request $request, int $id): JsonResponse
     {
         // Look for the nurse for ID
-        // Note: find() is one native method of ServiceEntityRepository and on to connect direct with the ID.
         $nurse = $this->nurseRepository->find($id);
-
-        // Verify should the nurse exists
         if (!$nurse) {
             return $this->json(['message' => "Nurse with ID {$id} not found."], Response::HTTP_NOT_FOUND);
         }
-
-        // Decode the JSON body of the request (JSON is expected for a PUT) 
         $data = json_decode($request->getContent(), true);
+
 
         if (!$data) {
             return $this->json(['message' => 'Body JSON invalid or empty'], Response::HTTP_BAD_REQUEST);
         }
-
-        // Update only the fields provided in the JSON
         if (isset($data['name'])) {
             $nurse->setName($data['name']);
         }
-
         if (isset($data['email'])) {
             $nurse->setEmail($data['email']);
-        }
-
-        // WARNING: In a aplication real, the passwords should hashearse before of the save (exemple: with the Security component).
+        }        
         if (isset($data['password'])) {
             $nurse->setPassword($data['password']);
         }
-
-        // Persist the changes in the database
-        // flush() It is necessary to run the updates in the DB.
         $this->entityManager->flush();
-
-        // Return a success response with the updated data
         return $this->json([
             'message' => 'Nurse update',
             'nurse' => [
