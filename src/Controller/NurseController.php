@@ -115,14 +115,21 @@ final class NurseController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        // Check if email already exists
+        // Check if email already exists with Regex for validating email (Fixed issue)
         $existing = $this->nurseRepository->findByEmail($data['email']);
+        if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+            return $this->json(
+                ['error' => 'Invalid email format'],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
         if (!empty($existing)) {
             return $this->json(
                 ['error' => 'Email already exists'],
                 Response::HTTP_BAD_REQUEST
             );
         }
+
 
         $nurse = new Nurse();
         $nurse->setName($data['name']);
