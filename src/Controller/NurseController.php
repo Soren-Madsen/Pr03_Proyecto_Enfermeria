@@ -38,10 +38,12 @@ final class NurseController extends AbstractController
                 'password' => $nurse->getPassword(),
             ];
         }
-
+        // If no nurse is found, return a 404 response (Fixed issue)
+        if (!$data) {
+            return $this->json(['error' => 'Nurse not found'], Response::HTTP_NOT_FOUND);
+        }
         return $this->json(['nurse' => $data], Response::HTTP_OK);
     }
-
     // GetAll function
     #[Route('/index', methods: ['GET'], name: 'allNurses')]
     public function getAll(): JsonResponse
