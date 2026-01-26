@@ -22,6 +22,9 @@ class Nurse
     #[ORM\Column(length: 50)]
     private ?string $password = null;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $profileImage = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -59,6 +62,18 @@ class Nurse
     public function setPassword(string $password): static
     {
         $this->password = $password;
+
+        return $this;
+    }
+
+    public function getProfileImage(): ?string
+    {
+        return $this->profileImage;
+    }
+
+    public function setProfileImage(?string $profileImage): static
+    {
+        $this->profileImage = $profileImage;
 
         return $this;
     }

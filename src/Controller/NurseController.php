@@ -55,7 +55,8 @@ final class NurseController extends AbstractController
                 'id' => $nurse->getId(),
                 'name' => $nurse->getName(),
                 'email' => $nurse->getEmail(),
-                'password' => $nurse->getPassword()
+                'password' => $nurse->getPassword(),
+                'profileImage' => $nurse->getProfileImage()
             ];
         }
         return $this->json($data, Response::HTTP_OK);
@@ -132,11 +133,19 @@ final class NurseController extends AbstractController
             );
         }
 
-
         $nurse = new Nurse();
         $nurse->setName($data['name']);
         $nurse->setEmail($data['email']);
         $nurse->setPassword($data['password']);
+        
+        // Validar y procesar imagen base64 si se proporciona
+        if (!empty($data['profileImage'])) {
+            $validatedImage = $this->validateAndProcessBase64Image($data['profileImage']);
+            if (is_array($validatedImage) && isset($validatedImage['error'])) {
+                return $this->json($validatedImage, Response::HTTP_BAD_REQUEST);
+            }
+            $nurse->setProfileImage($validatedImage);
+        }
 
         $em->persist($nurse);
         $em->flush();
@@ -161,7 +170,6 @@ final class NurseController extends AbstractController
         }
         $data = json_decode($request->getContent(), true);
 
-
         if (!$data) {
             return $this->json(['message' => 'Body JSON invalid or empty'], Response::HTTP_BAD_REQUEST);
         }
@@ -174,6 +182,13 @@ final class NurseController extends AbstractController
         if (isset($data['password'])) {
             $nurse->setPassword($data['password']);
         }
+        if (isset($data['profileImage'])) {
+            $validatedImage = $this->validateAndProcessBase64Image($data['profileImage']);
+            if (is_array($validatedImage) && isset($validatedImage['error'])) {
+                return $this->json($validatedImage, Response::HTTP_BAD_REQUEST);
+            }
+            $nurse->setProfileImage($validatedImage);
+        }
         $this->entityManager->flush();
         return $this->json([
             'message' => 'Nurse update',
@@ -181,6 +196,7 @@ final class NurseController extends AbstractController
                 'id' => $nurse->getId(),
                 'name' => $nurse->getName(),
                 'email' => $nurse->getEmail(),
+                'profileImage' => $nurse->getProfileImage(),
             ]
         ], Response::HTTP_OK);
     }
@@ -201,7 +217,8 @@ final class NurseController extends AbstractController
         $deletedNurseData = [
             'id' => $nurse->getId(),
             'name' => $nurse->getName(),
-            'email' => $nurse->getEmail()
+            'email' => $nurse->getEmail(),
+            'profileImage' => $nurse->getProfileImage()
         ];
 
         $entityManager->remove($nurse);
@@ -212,5 +229,68 @@ final class NurseController extends AbstractController
             'message' => "Nurse with ID {$id} successfully deleted!",
             'deleted_nurse' => $deletedNurseData
         ], Response::HTTP_OK);
+    }
+
+    /**
+     * Valida y procesa imágenes en formato base64
+     * Acepta: data:image/jpeg;base64,... o solo la cadena base64
+     */
+    private function validateAndProcessBase64Image(string $image): string|array
+    {
+        // Si es un data URI, extraer la parte base64
+        if (strpos($image, 'data:image/') === 0) {
+            if (preg_match('/^data:image\/(\w+);base64,(.+)$/', $image, $matches)) {
+                $mimeType = $matches[1];
+                $base64Data = $matches[2];
+                
+                // Validar tipo MIME permitido
+                $allowedMimes = ['jpeg', 'jpg', 'png', 'gif', 'webp'];
+                if (!in_array(strtolower($mimeType), $allowedMimes)) {
+                    return ['error' => 'Image type not allowed. Allowed types: jpeg, jpg, png, gif, webp'];
+                }
+            } else {
+                return ['error' => 'Invalid base64 format'];
+            }
+        } else {
+            $base64Data = $image;
+        }
+
+        // Validar que sea una cadena base64 válida
+        if (!$this->isValidBase64($base64Data)) {
+            return ['error' => 'Invalid base64 encoding'];
+        }
+
+        // Decodificar para obtener el tamaño en bytes
+        $decodedData = base64_decode($base64Data, true);
+        if ($decodedData === false) {
+            return ['error' => 'Failed to decode base64 data'];
+        }
+
+        // Limitar tamaño (ej: máximo 5MB)
+        $maxSize = 5 * 1024 * 1024; // 5MB
+        if (strlen($decodedData) > $maxSize) {
+            return ['error' => 'Image size exceeds maximum allowed (5MB)'];
+        }
+
+        // Retornar el data URI completo para almacenar
+        if (strpos($image, 'data:image/') === 0) {
+            return $image;
+        } else {
+            // Si solo se pasó base64, intentar detectar tipo (usar jpg por defecto)
+            return 'data:image/jpeg;base64,' . $base64Data;
+        }
+    }
+
+    /**
+     * Valida que una cadena sea base64 válida
+     */
+    private function isValidBase64(string $string): bool
+    {
+        $decoded = base64_decode($string, true);
+        if ($decoded === false) {
+            return false;
+        }
+        // Verificar que al codificar de nuevo obtenemos la misma cadena
+        return base64_encode($decoded) === $string;
     }
 }
