@@ -63,7 +63,7 @@ final class NurseController extends AbstractController
     }
 
     #[Route('/login', name: 'hospital_login', methods: ['POST'])]
-    public function login(Request $request): JsonResponse
+    /*public function login(Request $request): JsonResponse
     {
         // Form request, gets email and password from an HTML form
         $email = $request->request->get('email');
@@ -94,6 +94,40 @@ final class NurseController extends AbstractController
         }
         return new JsonResponse(['success' => $isValid], $isValid ? Response::HTTP_OK : Response::HTTP_UNAUTHORIZED);
     }
+*/
+
+    //Cambios del login connection con backend para retornar un ID
+    #[Route('/login', name: 'hospital_login', methods: ['POST'])]
+    public function login(Request $request): JsonResponse
+    {
+        // 1. Centralizamos la obtención de datos
+        $email = $request->request->get('email');
+        $password = $request->request->get('password');
+
+        if (!$email || !$password) {
+            $data = json_decode($request->getContent(), true);
+            $email = $data['email'] ?? null;
+            $password = $data['password'] ?? null;
+        }
+
+        // Usamos el metodo findOneBy porque devuelve un array
+        $nurse = $this->nurseRepository->findOneBy(['email' => $email]);
+
+        // Si existe la enfermera y si la contraseña coincide retornará el ID
+        if ($nurse && $nurse->getPassword() === $password) {
+            return new JsonResponse([
+                'success' => true,
+                'id' => $nurse->getId()
+            ], Response::HTTP_OK);
+        }
+
+        // Si da error retorna codigo error HTTP_UNAUTHORIZED
+        return new JsonResponse([
+            'success' => false, 
+            'message' => 'Credenciales inválidas'
+        ], Response::HTTP_UNAUTHORIZED);
+    }
+
 
     /**
      * FindByID function
