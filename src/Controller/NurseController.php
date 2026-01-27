@@ -123,7 +123,7 @@ final class NurseController extends AbstractController
 
         // Si da error retorna codigo error HTTP_UNAUTHORIZED
         return new JsonResponse([
-            'success' => false, 
+            'success' => false,
             'message' => 'Credenciales inválidas'
         ], Response::HTTP_UNAUTHORIZED);
     }
@@ -139,7 +139,13 @@ final class NurseController extends AbstractController
         $foundNurse = $nurseRepository->find($id);
         if ($foundNurse) {
             return $this->json([
-                'nurse' => $foundNurse,
+                'nurse' => [
+                    'id' => $foundNurse->getId(),
+                    'name' => $foundNurse->getName(),
+                    'email' => $foundNurse->getEmail(),
+                    'password' => $foundNurse->getPassword(),
+                    'profileImage' => $foundNurse->getProfileImage()
+                ],
                 'success' => "Nurse {$id} found!"
             ]);
         }
@@ -171,7 +177,7 @@ final class NurseController extends AbstractController
         $nurse->setName($data['name']);
         $nurse->setEmail($data['email']);
         $nurse->setPassword($data['password']);
-        
+
         // Validar y procesar imagen base64 si se proporciona
         if (!empty($data['profileImage'])) {
             $validatedImage = $this->validateAndProcessBase64Image($data['profileImage']);
@@ -212,7 +218,7 @@ final class NurseController extends AbstractController
         }
         if (isset($data['email'])) {
             $nurse->setEmail($data['email']);
-        }        
+        }
         if (isset($data['password'])) {
             $nurse->setPassword($data['password']);
         }
@@ -237,7 +243,7 @@ final class NurseController extends AbstractController
 
     /**
      * DeleteByID function (Elimina una enfermera por ID)
-     * Método: DELETE /nurse/id/{id}
+     * Método: DELETE /nurse/id/{id}s
      */
     #[Route('/id/{id}', methods: ['DELETE'], name: 'app_delete_by_id')]
     public function deleteByID(string $id, EntityManagerInterface $entityManager): JsonResponse
@@ -256,7 +262,7 @@ final class NurseController extends AbstractController
         ];
 
         $entityManager->remove($nurse);
-        $entityManager->flush(); 
+        $entityManager->flush();
 
 
         return $this->json([
@@ -276,7 +282,7 @@ final class NurseController extends AbstractController
             if (preg_match('/^data:image\/(\w+);base64,(.+)$/', $image, $matches)) {
                 $mimeType = $matches[1];
                 $base64Data = $matches[2];
-                
+
                 // Validar tipo MIME permitido
                 $allowedMimes = ['jpeg', 'jpg', 'png', 'gif', 'webp'];
                 if (!in_array(strtolower($mimeType), $allowedMimes)) {
