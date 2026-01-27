@@ -174,7 +174,7 @@ final class NurseController extends AbstractController
         }
 
         $nurse = new Nurse();
-        $nurse->setName($data['name']);
+        $nurse->setName($data['name'] ?? $data['email']); //por si viene vacío
         $nurse->setEmail($data['email']);
         $nurse->setPassword($data['password']);
 
