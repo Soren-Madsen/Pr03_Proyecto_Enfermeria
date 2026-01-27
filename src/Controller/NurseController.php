@@ -144,6 +144,7 @@ final class NurseController extends AbstractController
                     'name' => $foundNurse->getName(),
                     'email' => $foundNurse->getEmail(),
                     'password' => $foundNurse->getPassword(),
+                    'profileImage' => $foundNurse->getProfileImage()
                 ],
                 'success' => "Nurse {$id} found!"
             ]);
