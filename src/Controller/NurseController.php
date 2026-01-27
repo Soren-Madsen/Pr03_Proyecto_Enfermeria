@@ -243,7 +243,7 @@ final class NurseController extends AbstractController
 
     /**
      * DeleteByID function (Elimina una enfermera por ID)
-     * Método: DELETE /nurse/id/{id}
+     * Método: DELETE /nurse/id/{id}s
      */
     #[Route('/id/{id}', methods: ['DELETE'], name: 'app_delete_by_id')]
     public function deleteByID(string $id, EntityManagerInterface $entityManager): JsonResponse
