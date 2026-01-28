@@ -99,20 +99,24 @@ final class NurseController extends AbstractController
     #[Route('/login', name: 'hospital_login', methods: ['POST'])]
     public function login(Request $request): JsonResponse
     {
+        dd($request->getContent()); // Para saber que llega del Angular
+        $data = json_decode($request->getContent(), true);
+
         // 1. Centralizamos la obtención de datos
-        $email = $request->request->get('email');
-        $password = $request->request->get('password');
+        $email = $data['email'] ?? null;
+        $password = $data['password'] ?? null;
 
-        if (!$email || !$password) {
-            $data = json_decode($request->getContent(), true);
-            $email = $data['email'] ?? null;
-            $password = $data['password'] ?? null;
-        }
-
-        // Usamos el metodo findOneBy porque devuelve un array
+        //Busca a la enfermera
         $nurse = $this->nurseRepository->findOneBy(['email' => $email]);
 
+        if (!$email || !$password) {
+            return new JsonResponse(['error' => 'Faltan datos'], 400);
+        }
+
         // Si existe la enfermera y si la contraseña coincide retornará el ID
+        //Y compara si los password coinciden
+
+        /*
         if ($nurse && $nurse->getPassword() === $password) {
             return new JsonResponse([
                 'success' => true,
@@ -125,6 +129,11 @@ final class NurseController extends AbstractController
             'success' => false, 
             'message' => 'Credenciales inválidas'
         ], Response::HTTP_UNAUTHORIZED);
+        */
+
+        if ($nurse && $nurse->getPassword() === $password) {
+            return $this->json(['success' => true, 'id' => $nurse->getId()]);
+        }
     }
 
 
