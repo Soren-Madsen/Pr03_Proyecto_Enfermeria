@@ -99,34 +99,39 @@ final class NurseController extends AbstractController
     //Cambios del login connection con backend para retornar un ID
     #[Route('/login', name: 'hospital_login', methods: ['POST'])]
     public function login(Request $request): JsonResponse
-    {
-        // 1. Centralizamos la obtención de datos
-        $email = $request->request->get('email');
-        $password = $request->request->get('password');
+{
+    // Si la petición es OPTIONS (el navegador preguntando por permisos), respondemos OK
+    if ($request->getMethod() === 'OPTIONS') {
+        return new JsonResponse(null, Response::HTTP_OK);
+    }
 
-        if (!$email || !$password) {
-            $data = json_decode($request->getContent(), true);
-            $email = $data['email'] ?? null;
-            $password = $data['password'] ?? null;
-        }
+    $data = json_decode($request->getContent(), true);
+    $email = $data['email'] ?? null;
+    $password = $data['password'] ?? null;
 
-        // Usamos el metodo findOneBy porque devuelve un array
-        $nurse = $this->nurseRepository->findOneBy(['email' => $email]);
+    if (!$email || !$password) {
+        return $this->json(['success' => false, 'message' => 'Faltan datos'], 400);
+    }
 
-        // Si existe la enfermera y si la contraseña coincide retornará el ID
-        if ($nurse && $nurse->getPassword() === $password) {
-            return new JsonResponse([
-                'success' => true,
-                'id' => $nurse->getId()
-            ], Response::HTTP_OK);
-        }
+    $nurse = $this->nurseRepository->findOneBy(['email' => $email]);
 
+
+    if ($nurse && $nurse->getPassword() === $password) {
+        return $this->json([
+            'success' => true,
+            'id' => $nurse->getId()
+        ], 200);
+/*
         // Si da error retorna codigo error HTTP_UNAUTHORIZED
         return new JsonResponse([
             'success' => false,
             'message' => 'Credenciales inválidas'
         ], Response::HTTP_UNAUTHORIZED);
+*/
     }
+
+    return $this->json(['success' => false, 'message' => 'Credenciales incorrectas'], 401);
+}
 
 
     /**
