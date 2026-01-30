@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Repository\NurseRepository;
 use App\Entity\Nurse;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\Id;
 
 #[Route('/nurse')]
 final class NurseController extends AbstractController
@@ -62,71 +63,38 @@ final class NurseController extends AbstractController
         return $this->json($data, Response::HTTP_OK);
     }
 
-    #[Route('/login', name: 'hospital_login', methods: ['POST'])]
-    /*public function login(Request $request): JsonResponse
-    {
-        // Form request, gets email and password from an HTML form
-        $email = $request->request->get('email');
-        $password = $request->request->get('password');
-
-        // If the form request is null, try with JSON headers
-        if (!$email || !$password) {
-            $requestData = json_decode($request->getContent(), true);
-            $email = $requestData['email'] ?? null;
-            $password = $requestData['password'] ?? null;
-        }
-
-        // Get all of the data
-        $nurses = $this->nurseRepository->findByEmail($email);
-
-        // Key that keeps track if the request matches the local file, false by default.
-        $isValid = false;
-
-        // Checks DB data, separates all nurses into separate keys, reads and compares, 
-        // if one comparison returns true, skips to JsonResponse
-        if (isset($nurses) && is_array($nurses)) {
-            foreach ($nurses as $nurse) {
-                if ($nurse->getEmail() === $email && $nurse->getPassword() === $password) {
-                    $isValid = true;
-                    break;
-                }
-            }
-        }
-        return new JsonResponse(['success' => $isValid], $isValid ? Response::HTTP_OK : Response::HTTP_UNAUTHORIZED);
-    }
-*/
-
-    //Cambios del login connection con backend para retornar un ID
+    /**
+     * LOGIN
+     * @return Id
+     */
     #[Route('/login', name: 'hospital_login', methods: ['POST'])]
     public function login(Request $request): JsonResponse
-    {
-        // 1. Centralizamos la obtención de datos
-        $email = $request->request->get('email');
-        $password = $request->request->get('password');
+{
 
-        if (!$email || !$password) {
-            $data = json_decode($request->getContent(), true);
-            $email = $data['email'] ?? null;
-            $password = $data['password'] ?? null;
-        }
+    $data = json_decode($request->getContent(), true);
+    $email = $data['email'] ?? null;
+    $password = $data['password'] ?? null;
 
-        // Usamos el metodo findOneBy porque devuelve un array
-        $nurse = $this->nurseRepository->findOneBy(['email' => $email]);
+    if (!$email || !$password) {
+        return $this->json(['success' => false, 'message' => 'Faltan datos'], 400);
+    }
 
-        // Si existe la enfermera y si la contraseña coincide retornará el ID
-        if ($nurse && $nurse->getPassword() === $password) {
-            return new JsonResponse([
-                'success' => true,
-                'id' => $nurse->getId()
-            ], Response::HTTP_OK);
-        }
+    //Buscamos al enfermero por email
+    $nurse = $this->nurseRepository->findOneBy(['email' => $email]);
 
+    //Verificamos existencia y contraseña
+    if ($nurse && $nurse->getPassword() === $password) {
+        return $this->json([
+            'success' => true,
+            'id' => $nurse->getId()
+        ], Response::HTTP_OK);
+    }
         // Si da error retorna codigo error HTTP_UNAUTHORIZED
         return new JsonResponse([
             'success' => false,
             'message' => 'Credenciales inválidas'
         ], Response::HTTP_UNAUTHORIZED);
-    }
+}
 
 
     /**
