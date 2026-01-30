@@ -142,18 +142,10 @@ final class NurseController extends AbstractController
         }
 
         $nurse = new Nurse();
-        $nurse->setName($data['name'] ?? $data['email']); //por si viene vacío el name
         $nurse->setEmail($data['email']);
         $nurse->setPassword($data['password']);
 
-        // Validar y procesar imagen base64 si se proporciona
-        if (!empty($data['profileImage'])) {
-            $validatedImage = $this->validateAndProcessBase64Image($data['profileImage']);
-            if (is_array($validatedImage) && isset($validatedImage['error'])) {
-                return $this->json($validatedImage, Response::HTTP_BAD_REQUEST);
-            }
-            $nurse->setProfileImage($validatedImage);
-        }
+        $nurse->setName($data['email']);
 
         $em->persist($nurse);
         $em->flush();
