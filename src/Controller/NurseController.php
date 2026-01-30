@@ -125,16 +125,16 @@ final class NurseController extends AbstractController
     public function create(Request $request, EntityManagerInterface $em): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
+        
+
+        //Por si no existe email
+        if (!isset($data['email'])) {
+            return $this->json(['error' => 'Email is required'], Response::HTTP_BAD_REQUEST);
+        }
 
         // Check if email already exists with Regex for validating email (Fixed issue)
-        $existing = $this->nurseRepository->findByEmail($data['email']);
-        if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            return $this->json(
-                ['error' => 'Invalid email format'],
-                Response::HTTP_BAD_REQUEST
-            );
-        }
-        if (!empty($existing)) {
+        $existing = $this->nurseRepository->findOneBy(['email' => $data['email']]);
+        if ($existing) { // Si encuentra algo, ya no es null
             return $this->json(
                 ['error' => 'Email already exists'],
                 Response::HTTP_BAD_REQUEST
@@ -142,18 +142,10 @@ final class NurseController extends AbstractController
         }
 
         $nurse = new Nurse();
-        $nurse->setName($data['name']);
         $nurse->setEmail($data['email']);
         $nurse->setPassword($data['password']);
 
-        // Validar y procesar imagen base64 si se proporciona
-        if (!empty($data['profileImage'])) {
-            $validatedImage = $this->validateAndProcessBase64Image($data['profileImage']);
-            if (is_array($validatedImage) && isset($validatedImage['error'])) {
-                return $this->json($validatedImage, Response::HTTP_BAD_REQUEST);
-            }
-            $nurse->setProfileImage($validatedImage);
-        }
+        $nurse->setName($data['email']);
 
         $em->persist($nurse);
         $em->flush();
